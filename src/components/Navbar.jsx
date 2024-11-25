@@ -3,21 +3,17 @@ import { Link } from 'react-router-dom';
 
 const Navbar = () => {
   return (
-    <nav className="bg-blue-500 text-white p-4">
-      <div className="container mx-auto flex justify-between items-center">
-        <h1 className="text-lg font-bold">My Website</h1>
-        <ul className="flex space-x-4">
-          <li>
-            <Link to="/" className="hover:underline">
-              Home
-            </Link>
-          </li>
-          <li>
-            <Link to="/about" className="hover:underline">
-              About
-            </Link>
-          </li>
-        </ul>
+    <nav className="text-white px-4 py-2 flex justify-between items-center">
+      <div className="text-xl font-bold flex items-center space-x-2">
+        <div className="bg-white p-1 rounded-full">
+          <img src="/images/shopee-logo.png" alt="Shopee" className="h-8" />
+        </div>
+      </div>
+      <div className="flex items-center space-x-2">
+        <div className="bg-gray text-black w-8 h-8 flex justify-center items-center rounded-full">
+          K
+        </div>
+        <span>Khoa</span>
       </div>
     </nav>
   );
