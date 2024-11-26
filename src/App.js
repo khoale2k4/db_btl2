@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import ProductsPages from './pages/Products';
 import Home from './pages/Home';
-import RatingProductsPages from './pages/RatingProducts';
+import RatingAndCategoryProductsPages from './pages/RatingProductsAndCategories';
 
 const App = () => {
   return (
@@ -12,7 +12,9 @@ const App = () => {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/vendor" element={<ProductsPages />} />
-        <Route path="/vendor/rate" element={<RatingProductsPages />} />
+        <Route path="/vendor/rate" element={<RatingAndCategoryProductsPages />} />
+        <Route path="/vendor/rate/products/:name" element={<RatingAndCategoryProductsPages />} />
+        <Route path="/vendor/rate/categories" element={<RatingAndCategoryProductsPages />} />
         {/* Thêm các route khác nếu cần */}
       </Routes>
     </Router>

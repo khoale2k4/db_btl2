@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 const DataTable = ({
   data,
@@ -7,6 +7,7 @@ const DataTable = ({
   totalPages,
   handlePreviousPage,
   handleNextPage,
+  onClick, 
   children,
 }) => {
   return (
@@ -25,7 +26,11 @@ const DataTable = ({
         </thead>
         <tbody>
           {data.map((item, index) => (
-            <tr key={index}>
+            <tr
+              key={index}
+              onClick={() => onClick && onClick(item)} // Gọi hàm onClick khi nhấn vào hàng
+              className="cursor-pointer hover:bg-gray-100"
+            >
               {columns.map((column) => (
                 <td key={column.accessor} className="border-b p-4">
                   {column.accessor === "image" ? (
@@ -44,7 +49,6 @@ const DataTable = ({
         </tbody>
       </table>
 
-
       <div className="flex items-center justify-between mt-4">
         <div className="flex items-center space-x-4">
           <button
@@ -54,7 +58,9 @@ const DataTable = ({
           >
             Trang trước
           </button>
-          <span className="font-medium">{page} / {totalPages}</span>
+          <span className="font-medium">
+            {page} / {totalPages}
+          </span>
           <button
             className="bg-gray-200 px-4 py-2 rounded-lg"
             onClick={handleNextPage}
