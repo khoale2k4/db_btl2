@@ -1,7 +1,9 @@
 import React from "react";
 import DataTable from '../components/DataTable.jsx';
+import { useNavigate, useParams } from "react-router-dom";
 
 const column = [
+    // { header: "Ngành hàng", accessor: "category" },
     { header: "Người đánh giá", accessor: "name" },
     { header: "Số điểm", accessor: "rate" },
     { header: "Bình luận", accessor: "comment" },
@@ -12,13 +14,38 @@ const RatingProductsPages = () => {
     const [startDate, setStartDate] = React.useState('2024-01-01');
     const [endDate, setEndDate] = React.useState('2024-10-01');
     const { productName } = useParams();
-
-    const sampleProducts = [
-        { name: 'Sản phẩm 1', price: '100.000 VNĐ', sold: 50, image: 'https://cdn.shopify.com/s/files/1/0070/7032/files/trending-products_c8d0d15c-9afc-47e3-9ba2-f7bad0505b9b.png?v=1614559651' },
-        { name: 'Sản phẩm 2', price: '200.000 VNĐ', sold: 30, image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcThuRLQ00PI01Wk9hq7N0HdhLaJgUw_e925CQ&s' },
-        { name: 'Sản phẩm 3', price: '150.000 VNĐ', sold: 20, image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTSykUhFDLt30fbBfTxIm4h-tCKn8u9T-MKgQ&s' },
-        { name: 'Sản phẩm 4', price: '300.000 VNĐ', sold: 10, image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS7YeQs9C83XEO8vD5CMxIpWgCpeRxGlVHxMQ&s' },
-        { name: 'Sản phẩm 5', price: '250.000 VNĐ', sold: 5, image: 'https://thumbs.dreamstime.com/b/shopping-carte-groceries-cart-isolated-white-30481805.jpg' },
+    const navigate = useNavigate(); 
+    const sampleData = [
+        {
+            name: "Nguyễn Văn A",
+            category: "Ngành 1",
+            rate: 5,
+            comment: "Sản phẩm rất tốt, đáng mua!",
+        },
+        {
+            name: "Trần Thị B",
+            category: "Ngành 1",
+            rate: 4,
+            comment: "Chất lượng ổn nhưng giao hàng hơi chậm.",
+        },
+        {
+            name: "Phạm Văn C",
+            category: "Ngành 1",
+            rate: 3,
+            comment: "Giá hơi cao so với chất lượng.",
+        },
+        {
+            name: "Lê Thị D",
+            category: "Ngành 1",
+            rate: 2,
+            comment: "Sản phẩm không giống như hình ảnh.",
+        },
+        {
+            name: "Hoàng Văn E",
+            category: "Ngành 1",
+            rate: 1,
+            comment: "Rất thất vọng, sẽ không mua lần sau.",
+        },
     ];
 
     const handleSearch = () => {
@@ -33,7 +60,7 @@ const RatingProductsPages = () => {
 
     const [page, setPage] = React.useState(1);
     const itemsPerPage = 5;
-    const totalPages = Math.ceil(sampleProducts.length / itemsPerPage);
+    const totalPages = Math.ceil(sampleData.length / itemsPerPage);
 
     const handlePreviousPage = () => {
         if (page > 1) setPage(page - 1);
@@ -43,10 +70,14 @@ const RatingProductsPages = () => {
         if (page < totalPages) setPage(page + 1);
     };
 
+    const handleRowClick = (item) => {
+        navigate(`/vendor/rate/${item.id}`);
+    };
+
     return (
         <div className="bg-gray-100 min-h-screen">
             <div className="p-4">
-                <h1 className="text-2xl font-bold mb-4">Đánh giá về sản phẩm `{productName}`</h1>
+                <h1 className="text-2xl font-bold mb-4">Đánh giá về sản phẩm {productName}</h1>
                 <div className="bg-white p-4 rounded shadow">
                     {/* Search Form */}
                     <div className="flex space-x-4 mb-4">
@@ -85,12 +116,13 @@ const RatingProductsPages = () => {
                         </div>
 
                         <DataTable
-                            data={sampleProducts}
+                            data={sampleData}
                             columns={column}
                             page={page}
                             totalPages={totalPages}
                             handlePreviousPage={handlePreviousPage}
                             handleNextPage={handleNextPage}
+                            onClick={handleRowClick}
                         />
                     </div>
                 </div>

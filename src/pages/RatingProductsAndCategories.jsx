@@ -67,7 +67,8 @@ const RatingAndCategoryProductsPages = () => {
     }
 
     const handleRowClick = (item) => {
-        navigate(`/vendor/rate/products/${item.id}`);
+        if(searchField==="Sản phẩm") navigate(`/vendor/rate/products/${item.name}`);
+        else navigate(`/vendor/rate/categories/${item.name}`);
     };
 
     return (
