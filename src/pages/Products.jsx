@@ -1,4 +1,12 @@
 import React from "react";
+import DataTable from '../components/DataTable.jsx';
+
+const column = [
+    { header: " ", accessor: "image" },
+    { header: "Tên sản phẩm", accessor: "name" },
+    { header: "Giá bán", accessor: "price" },
+    { header: "Đã bán", accessor: "sold" },
+]
 
 const ProductsPages = () => {
     const [searchTerm, setSearchTerm] = React.useState('');
@@ -23,6 +31,18 @@ const ProductsPages = () => {
         setSearchTerm('');
         setStartDate('2024-01-01');
         setEndDate('2024-10-01');
+    };
+
+    const [page, setPage] = React.useState(1);
+    const itemsPerPage = 5;
+    const totalPages = Math.ceil(sampleProducts.length / itemsPerPage);
+
+    const handlePreviousPage = () => {
+        if (page > 1) setPage(page - 1);
+    };
+
+    const handleNextPage = () => {
+        if (page < totalPages) setPage(page + 1);
     };
 
     return (
@@ -65,34 +85,15 @@ const ProductsPages = () => {
                         <div className="text-right mb-2">
                             <button className="border px-4 py-2 rounded">Tăng/Giảm</button>
                         </div>
-                        <table className="table-auto w-full border-collapse">
-                            <thead>
-                                <tr>
-                                    <th className="p-2 text-left"> </th>
-                                    <th className="p-2 text-left">Tên sản phẩm</th>
-                                    <th className="p-2 text-left">Giá bán</th>
-                                    <th className="p-2 text-left">Số lượng bán được</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {products.length === 0 ? (
-                                    <tr>
-                                        <td className="p-2 text-center" colSpan="4">Không có sản phẩm nào</td>
-                                    </tr>
-                                ) : (
-                                    products.map((product, index) => (
-                                        <tr key={index} className="text-left">
-                                            <td className="p-2">
-                                                <img src={product.image} alt={product.name} className="w-24 h-24 object-cover" />
-                                            </td>
-                                            <td className="p-2">{product.name}</td>
-                                            <td className="p-2">{product.price}</td>
-                                            <td className="p-2">{product.sold}</td>
-                                        </tr>
-                                    ))
-                                )}
-                            </tbody>
-                        </table>
+
+                        <DataTable
+                            data={sampleProducts}
+                            columns={column}
+                            page={page}
+                            totalPages={totalPages}
+                            handlePreviousPage={handlePreviousPage}
+                            handleNextPage={handleNextPage}
+                        />
                     </div>
                 </div>
             </div>

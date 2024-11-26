@@ -10,10 +10,10 @@ const Navbar = () => {
         </div>
       </div>
       <div className="flex items-center space-x-2">
-        <div className="bg-gray text-black w-8 h-8 flex justify-center items-center rounded-full">
+        <div className="bg-gray-800 text-white w-10 h-10 flex justify-center items-center rounded-full border-2 border-white shadow-lg">
           K
         </div>
-        <span>Khoa</span>
+        <span className="text-black font-semibold">Khoa</span>
       </div>
     </nav>
   );
