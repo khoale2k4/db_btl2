@@ -7,7 +7,7 @@ import RatingAndCategoryProductsPages from './pages/RatingProductsAndCategories'
 import RatingProductsPages from './pages/RateProducts';
 import RatingCategoriesPages from './pages/RateCategories';
 import ProductReviewDetails from './pages/RateDetail';
-
+import DataFetcher from './pages/dataFetcher';
 const App = () => {
   return (
     <Router>
@@ -19,6 +19,8 @@ const App = () => {
         <Route path="/vendor/rate/products/:productName" element={<RatingProductsPages />} />
         <Route path="/vendor/rate/categories/:categoryName" element={<RatingCategoriesPages />} />
         <Route path="/vendor/rate/:reviewId" element={<ProductReviewDetails />} />
+
+        <Route path="/vendor/data" element={<DataFetcher />} />
         {/* Thêm các route khác nếu cần */}
       </Routes>
     </Router>

@@ -1,17 +1,25 @@
-import React from "react";
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 import DataTable from '../components/DataTable.jsx';
 
 const column = [
-    { header: " ", accessor: "image" },
-    { header: "Tên sản phẩm", accessor: "name" },
-    { header: "Giá bán", accessor: "price" },
-    { header: "Đã bán", accessor: "sold" },
+    { header: " ", accessor: "ProductImage" },
+    { header: "Tên sản phẩm", accessor: "ProductName" },
+    { header: "Giá bán", accessor: "SalePrice" },
+    { header: "Đã bán", accessor: "StockQuantity" },
 ]
 
 const ProductsPages = () => {
     const [searchTerm, setSearchTerm] = React.useState('');
     const [startDate, setStartDate] = React.useState('2024-01-01');
     const [endDate, setEndDate] = React.useState('2024-10-01');
+    const [data2, setData2] = React.useState([]);
+
+    useEffect(() => {
+        axios.get('http://localhost:5000/api/data/products')
+            .then(response => setData2(response.data))
+            .catch(error => console.error('Error fetching data:', error));
+    }, []);
 
     const sampleProducts = [
         { name: 'Sản phẩm 1', price: '100.000 VNĐ', sold: 50, image: 'https://cdn.shopify.com/s/files/1/0070/7032/files/trending-products_c8d0d15c-9afc-47e3-9ba2-f7bad0505b9b.png?v=1614559651' },
@@ -20,6 +28,7 @@ const ProductsPages = () => {
         { name: 'Sản phẩm 4', price: '300.000 VNĐ', sold: 10, image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS7YeQs9C83XEO8vD5CMxIpWgCpeRxGlVHxMQ&s' },
         { name: 'Sản phẩm 5', price: '250.000 VNĐ', sold: 5, image: 'https://thumbs.dreamstime.com/b/shopping-carte-groceries-cart-isolated-white-30481805.jpg' },
     ];
+
 
     const [products, setProducts] = React.useState(sampleProducts);
 
@@ -87,7 +96,7 @@ const ProductsPages = () => {
                         </div>
 
                         <DataTable
-                            data={sampleProducts}
+                            data={data2}
                             columns={column}
                             page={page}
                             totalPages={totalPages}
