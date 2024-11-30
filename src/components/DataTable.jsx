@@ -33,7 +33,7 @@ const DataTable = ({
             >
               {columns.map((column) => (
                 <td key={column.accessor} className="border-b p-4">
-                  {column.accessor === "image" ? (
+                  {column.accessor === "ProductImage" ? (
                     <img
                       src={item[column.accessor]}
                       alt={item.name || "Hình ảnh"}
