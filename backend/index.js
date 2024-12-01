@@ -225,6 +225,13 @@ app.get('/api/getProducts', async (req, res) => {
     }
 });
 
+// 2.3.2
+// 2.3.3
+// 2.3.4
+// 2.3.5
+// 2.3.6
+// 2.3.7
+
 const PORT = 3001;
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
