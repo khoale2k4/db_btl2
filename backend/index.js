@@ -206,7 +206,11 @@ app.get('/api/getProducts', async (req, res) => {
         const end = req.query.end ?? '2024-12-31';
         const pool = await poolPromise;
         const query = `EXEC GetProductSalesByVendor @p_VendorID = ${vendorId}, @startDate = \'${start}\', @endDate = \'${end}\'`;
-        const result = await pool.request().query(query);
+        const result = await pool.request()
+            .input('p_VendorID', sql.Int, vendorId)
+            .input('startDate', sql.Date, start)
+            .input('endDate', sql.Date, end) 
+            .execute('GetProductSalesByVendor');
         res.json({
             success: true,
             message: query,
