@@ -1,7 +1,7 @@
 import React from "react";
 
 const DataTable = ({
-  data,
+  data = [],
   columns,
   page,
   totalPages,
@@ -25,7 +25,7 @@ const DataTable = ({
           </tr>
         </thead>
         <tbody>
-          {data.map((item, index) => (
+          {Array.isArray(data) && data.map((item, index) => (
             <tr
               key={index}
               onClick={() => onClick && onClick(item)} // Gọi hàm onClick khi nhấn vào hàng

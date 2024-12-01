@@ -199,6 +199,17 @@ app.get('/api/data/Review', async (req, res) => {
 
 // 2.3.1
 // http://localhost:3001/api/getProducts?vendorId=2&start=2024-01-01&end=2024-12-31
+// {
+//   "success": true,
+//   "message": "EXEC GetProductSalesByVendor @p_VendorID = 2, @startDate = '2024-01-01', @endDate = '2024-12-31'",
+//   "data": [
+//     {
+//       "ProductName": "Smartphone",
+//       "TotalQuantitySold": 1,
+//       "TotalSalesAmount": 500
+//     }
+//   ]
+// }
 app.get('/api/getProducts', async (req, res) => {
     try {
         const vendorId = req.query.vendorId;
@@ -219,18 +230,132 @@ app.get('/api/getProducts', async (req, res) => {
     } catch (err) {
         res.status(500).send({
             success: false,
-            message: query,
+            message: "Lỗi: " + err,
+            data: null
+        });
+    }
+});
+// 2.3.2
+app.get('/api/getCategoryAverageRatingAndRevenueByVendor', async (req, res) => {
+    try {
+        const vendorId = req.query.vendorId;
+
+        const pool = await poolPromise;
+        const result = await pool.request()
+            .input('VendorID', sql.Int, vendorId)  // Truyền tham số VendorID
+            .execute('GetCategoryAverageRatingAndRevenueByVendor');  // Gọi stored procedure
+
+        res.json({
+            success: true,
+            message: 'Category average ratings and revenue fetched successfully.',
+            data: result.recordset
+        });
+    } catch (err) {
+        res.status(500).send({
+            success: false,
+            message: "Lỗi: " + err.message,
             data: null
         });
     }
 });
 
-// 2.3.2
 // 2.3.3
+app.get('/api/getReviewsByCategoryAndVendor', async (req, res) => {
+    try {
+        const categoryId = req.query.categoryId;
+        const vendorId = req.query.vendorId;
+
+        const pool = await poolPromise;
+        const result = await pool.request()
+            .input('CategoryID', sql.Int, categoryId)  // Truyền tham số CategoryID
+            .input('VendorID', sql.Int, vendorId)  // Truyền tham số VendorID
+            .execute('GetReviewsByCategoryAndVendor');  // Gọi stored procedure
+
+        res.json({
+            success: true,
+            message: 'Product reviews by category and vendor fetched successfully.',
+            data: result.recordset
+        });
+    } catch (err) {
+        res.status(500).send({
+            success: false,
+            message: "Lỗi: " + err.message,
+            data: null
+        });
+    }
+});
+
 // 2.3.4
+app.get('/api/getVendorProductStats', async (req, res) => {
+    try {
+        const vendorId = req.query.vendorId;
+
+        const pool = await poolPromise;
+        const result = await pool.request()
+            .input('VendorID', sql.Int, vendorId)  // Truyền tham số VendorID
+            .execute('GetVendorProductStats');  // Gọi stored procedure
+
+        res.json({
+            success: true,
+            message: 'Vendor product stats fetched successfully.',
+            data: result.recordset
+        });
+    } catch (err) {
+        res.status(500).send({
+            success: false,
+            message: "Lỗi: " + err.message,
+            data: null
+        });
+    }
+});
+
 // 2.3.5
+app.get('/api/getProductReviews', async (req, res) => {
+    try {
+        const productId = req.query.productId;
+
+        const pool = await poolPromise;
+        const result = await pool.request()
+            .input('ProductID', sql.Int, productId)  // Truyền tham số ProductID
+            .execute('GetProductReviews');  // Gọi stored procedure
+
+        res.json({
+            success: true,
+            message: 'Product reviews fetched successfully.',
+            data: result.recordset
+        });
+    } catch (err) {
+        res.status(500).send({
+            success: false,
+            message: "Lỗi: " + err.message,
+            data: null
+        });
+    }
+});
+
 // 2.3.6
-// 2.3.7
+app.get('/api/getReviewDetails', async (req, res) => {
+    try {
+        const reviewId = req.query.reviewId;
+
+        const pool = await poolPromise;
+        const result = await pool.request()
+            .input('ReviewID', sql.Int, reviewId)  // Truyền tham số ReviewID
+            .execute('GetReviewDetails');  // Gọi stored procedure
+
+        res.json({
+            success: true,
+            message: 'Review details fetched successfully.',
+            data: result.recordset
+        });
+    } catch (err) {
+        res.status(500).send({
+            success: false,
+            message: "Lỗi: " + err.message,
+            data: null
+        });
+    }
+});
 
 const PORT = 3001;
 app.listen(PORT, () => {

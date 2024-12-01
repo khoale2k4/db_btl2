@@ -3,34 +3,25 @@ import axios from 'axios';
 import DataTable from '../components/DataTable.jsx';
 
 const column = [
-    { header: " ", accessor: "ProductImage" },
+    // { header: " ", accessor: "ProductImage" },
     { header: "Tên sản phẩm", accessor: "ProductName" },
-    { header: "Giá bán", accessor: "SalePrice" },
-    { header: "Đã bán", accessor: "StockQuantity" },
+    { header: "Tổng doanh thu (nghìn VNĐ)", accessor: "TotalSalesAmount" },
+    { header: "Đã bán", accessor: "TotalQuantitySold" },
 ]
 
 const ProductsPages = () => {
     const [searchTerm, setSearchTerm] = React.useState('');
     const [startDate, setStartDate] = React.useState('2024-01-01');
-    const [endDate, setEndDate] = React.useState('2024-10-01');
+    const [endDate, setEndDate] = React.useState('2024-12-31');
     const [data2, setData2] = React.useState([]);
+    const vendorId = 2;
 
     useEffect(() => {
-        axios.get('http://localhost:5000/api/data/products')
-            .then(response => setData2(response.data))
+        axios.get(`http://localhost:3001/api/getProducts?vendorId=${vendorId}&start=${startDate}&end=${endDate}`)
+            .then(response => {setData2(response.data.data); console.log(response);})
             .catch(error => console.error('Error fetching data:', error));
+            console.log(data2);
     }, []);
-
-    const sampleProducts = [
-        { name: 'Sản phẩm 1', price: '100.000 VNĐ', sold: 50, image: 'https://cdn.shopify.com/s/files/1/0070/7032/files/trending-products_c8d0d15c-9afc-47e3-9ba2-f7bad0505b9b.png?v=1614559651' },
-        { name: 'Sản phẩm 2', price: '200.000 VNĐ', sold: 30, image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcThuRLQ00PI01Wk9hq7N0HdhLaJgUw_e925CQ&s' },
-        { name: 'Sản phẩm 3', price: '150.000 VNĐ', sold: 20, image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTSykUhFDLt30fbBfTxIm4h-tCKn8u9T-MKgQ&s' },
-        { name: 'Sản phẩm 4', price: '300.000 VNĐ', sold: 10, image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS7YeQs9C83XEO8vD5CMxIpWgCpeRxGlVHxMQ&s' },
-        { name: 'Sản phẩm 5', price: '250.000 VNĐ', sold: 5, image: 'https://thumbs.dreamstime.com/b/shopping-carte-groceries-cart-isolated-white-30481805.jpg' },
-    ];
-
-
-    const [products, setProducts] = React.useState(sampleProducts);
 
     const handleSearch = () => {
         console.log(`Tìm kiếm: ${searchTerm}, từ ${startDate} đến ${endDate}`);
@@ -44,7 +35,7 @@ const ProductsPages = () => {
 
     const [page, setPage] = React.useState(1);
     const itemsPerPage = 5;
-    const totalPages = Math.ceil(sampleProducts.length / itemsPerPage);
+    const totalPages = Math.ceil(data2.length / itemsPerPage);
 
     const handlePreviousPage = () => {
         if (page > 1) setPage(page - 1);
@@ -97,6 +88,7 @@ const ProductsPages = () => {
 
                         <DataTable
                             data={data2}
+                                // .slice((page - 1) * itemsPerPage, page * itemsPerPage)}
                             columns={column}
                             page={page}
                             totalPages={totalPages}

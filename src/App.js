@@ -16,8 +16,8 @@ const App = () => {
         <Route path="/" element={<Home />} />
         <Route path="/vendor" element={<ProductsPages />} />
         <Route path="/vendor/rate" element={<RatingAndCategoryProductsPages />} />
-        <Route path="/vendor/rate/products/:productName" element={<RatingProductsPages />} />
-        <Route path="/vendor/rate/categories/:categoryName" element={<RatingCategoriesPages />} />
+        <Route path="/vendor/rate/products/:productId" element={<RatingProductsPages />} />
+        <Route path="/vendor/rate/categories/:categoryId" element={<RatingCategoriesPages />} />
         <Route path="/vendor/rate/:reviewId" element={<ProductReviewDetails />} />
 
         <Route path="/vendor/data" element={<DataFetcher />} />
