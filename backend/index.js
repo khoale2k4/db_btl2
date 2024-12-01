@@ -194,7 +194,34 @@ app.get('/api/data/Review', async (req, res) => {
     }
 });
 
-const PORT = 5000;
+// 2.2.1
+// 2.2.2
+
+// 2.3.1
+// http://localhost:3001/api/getProducts?vendorId=2&start=2024-01-01&end=2024-12-31
+app.get('/api/getProducts', async (req, res) => {
+    try {
+        const vendorId = req.query.vendorId;
+        const start = req.query.start ?? '2024-01-01';
+        const end = req.query.end ?? '2024-12-31';
+        const pool = await poolPromise;
+        const query = `EXEC GetProductSalesByVendor @p_VendorID = ${vendorId}, @startDate = \'${start}\', @endDate = \'${end}\'`;
+        const result = await pool.request().query(query);
+        res.json({
+            success: true,
+            message: query,
+            data: result.recordset
+        });
+    } catch (err) {
+        res.status(500).send({
+            success: false,
+            message: query,
+            data: null
+        });
+    }
+});
+
+const PORT = 3001;
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
 });
