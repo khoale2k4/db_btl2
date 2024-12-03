@@ -18,6 +18,7 @@ const RatingCategoriesPages = () => {
     const [error, setError] = useState(null);
     const [isAscending, setIsAscending] = useState(true); // Toggle tăng/giảm
     const [page, setPage] = useState(1);
+    const vendorId = 2;
     const itemsPerPage = 5;
 
     const { categoryId } = useParams();
@@ -29,7 +30,7 @@ const RatingCategoriesPages = () => {
         setError(null);
         try {
             const response = await fetch(
-                `http://localhost:3001/api/getReviewsByCategoryAndVendor?vendorId=1&categoryId=${categoryId}`
+                `http://localhost:3001/api/getReviewsByCategoryAndVendor?vendorId=${vendorId}&categoryId=${categoryId}`
             );
             const data = await response.json();
             if (data.success) {

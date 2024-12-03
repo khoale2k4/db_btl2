@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import DataTable from '../components/DataTable.jsx';
 
 const columnProduct = [
+    { header: " ", accessor: "ProductImage" },
     { header: "Tên sản phẩm", accessor: "ProductName" },
     { header: "Doanh thu (nghìn VNĐ)", accessor: "TotalRevenue" },
     { header: "Đã bán", accessor: "Sold" },
@@ -25,7 +26,7 @@ const RatingAndCategoryProductsPages = () => {
     const [products, setProducts] = React.useState([]);
     const [selectedField, setSelectedField] = useState("TotalRevenue"); // Trường được chọn
     const [isAscending, setIsAscending] = useState(true); // Toggle tăng/giảm
-    const vendorId = 1;
+    const vendorId = 2;
     const itemsPerPage = 5; // Số lượng mục mỗi trang
     const navigate = useNavigate();
 

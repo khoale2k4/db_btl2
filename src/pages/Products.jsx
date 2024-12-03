@@ -3,7 +3,7 @@ import axios from 'axios';
 import DataTable from '../components/DataTable.jsx';
 
 const column = [
-    // { header: " ", accessor: "ProductImage" },
+    { header: " ", accessor: "ProductImage" },
     { header: "Tên sản phẩm", accessor: "ProductName" },
     { header: "Tổng doanh thu (nghìn VNĐ)", accessor: "TotalSalesAmount" },
     { header: "Đã bán", accessor: "TotalQuantitySold" },
