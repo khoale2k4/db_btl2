@@ -17,14 +17,19 @@ const ProductsPages = () => {
     const vendorId = 2;
 
     useEffect(() => {
+        fetchProducts();
+    }, []);
+
+    const fetchProducts = () => {
         axios.get(`http://localhost:3001/api/getProducts?vendorId=${vendorId}&start=${startDate}&end=${endDate}`)
             .then(response => {setData2(response.data.data); console.log(response);})
             .catch(error => console.error('Error fetching data:', error));
             console.log(data2);
-    }, []);
+    }
 
     const handleSearch = () => {
         console.log(`Tìm kiếm: ${searchTerm}, từ ${startDate} đến ${endDate}`);
+        fetchProducts();
     };
 
     const clearFilters = () => {
@@ -82,13 +87,9 @@ const ProductsPages = () => {
 
                     {/* Table */}
                     <div>
-                        <div className="text-right mb-2">
-                            <button className="border px-4 py-2 rounded">Tăng/Giảm</button>
-                        </div>
-
                         <DataTable
-                            data={data2}
-                                // .slice((page - 1) * itemsPerPage, page * itemsPerPage)}
+                            data={data2.slice((page - 1) * itemsPerPage, page * itemsPerPage)}
+                                // 
                             columns={column}
                             page={page}
                             totalPages={totalPages}

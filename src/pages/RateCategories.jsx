@@ -1,5 +1,5 @@
-import React from "react";
-import DataTable from '../components/DataTable.jsx';
+import React, { useState, useEffect } from "react";
+import DataTable from "../components/DataTable.jsx";
 import { useNavigate, useParams } from "react-router-dom";
 
 const column = [
@@ -7,52 +7,78 @@ const column = [
     { header: "Sản phẩm", accessor: "ProductName" },
     { header: "Số điểm", accessor: "RatingScore" },
     { header: "Bình luận", accessor: "ReviewComment" },
-]
+];
 
 const RatingCategoriesPages = () => {
-    const [searchTerm, setSearchTerm] = React.useState('');
-    const [startDate, setStartDate] = React.useState('2024-01-01');
-    const [endDate, setEndDate] = React.useState('2024-10-01');
+    const [searchTerm, setSearchTerm] = useState("");
+    const [searchField, setSearchField] = useState("ReviewerName"); // Trường lọc mặc định
+    const [ratingData, setRatingData] = useState([]);
+    const [filteredData, setFilteredData] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [isAscending, setIsAscending] = useState(true); // Toggle tăng/giảm
+    const [page, setPage] = useState(1);
+    const itemsPerPage = 5;
+
     const { categoryId } = useParams();
-    const navigate = useNavigate(); 
-    const [ratingData, setRatingData] = React.useState([]); // Dữ liệu nhận từ API
-    const [loading, setLoading] = React.useState(true); // Trạng thái loading
-    const [error, setError] = React.useState(null); // Xử lý lỗi
+    const navigate = useNavigate();
 
     // Fetch dữ liệu từ API
     const fetchRatingData = async () => {
+        setLoading(true);
+        setError(null);
         try {
-            const response = await fetch(`http://localhost:3001/api/getReviewsByCategoryAndVendor?vendorId=1&categoryId=${categoryId}`);
+            const response = await fetch(
+                `http://localhost:3001/api/getReviewsByCategoryAndVendor?vendorId=1&categoryId=${categoryId}`
+            );
             const data = await response.json();
             if (data.success) {
-                setRatingData(data.data); // Cập nhật dữ liệu vào state
+                setRatingData(data.data);
+                setFilteredData(data.data);
             } else {
                 setError("Không thể lấy dữ liệu.");
             }
-        } catch (error) {
+        } catch (err) {
             setError("Lỗi khi gọi API.");
         } finally {
             setLoading(false);
         }
     };
 
-    React.useEffect(() => {
-        fetchRatingData(); // Gọi API khi component được render
+    useEffect(() => {
+        fetchRatingData();
     }, []);
 
-    const handleSearch = () => {
-        console.log(`Tìm kiếm: ${searchTerm}, từ ${startDate} đến ${endDate}`);
+    // Thực hiện tìm kiếm ngay khi người dùng nhập
+    useEffect(() => {
+        const filtered = ratingData.filter((item) => {
+            return (
+                searchTerm === "" ||
+                item[searchField]
+                    ?.toString()
+                    .toLowerCase()
+                    .includes(searchTerm.toLowerCase())
+            );
+        });
+
+        setFilteredData(filtered);
+        setPage(1); // Reset về trang đầu
+    }, [searchTerm, searchField, ratingData]);
+
+    // Xử lý sắp xếp
+    const handleSort = () => {
+        const sorted = [...filteredData].sort((a, b) => {
+            const comparison =
+                a[searchField] > b[searchField] ? 1 : a[searchField] < b[searchField] ? -1 : 0;
+            return isAscending ? comparison : -comparison;
+        });
+
+        setFilteredData(sorted);
+        setIsAscending(!isAscending); // Toggle thứ tự sắp xếp
     };
 
-    const clearFilters = () => {
-        setSearchTerm('');
-        setStartDate('2024-01-01');
-        setEndDate('2024-10-01');
-    };
-
-    const [page, setPage] = React.useState(1);
-    const itemsPerPage = 5;
-    const totalPages = Math.ceil(ratingData.length / itemsPerPage);
+    // Tính toán phân trang
+    const totalPages = Math.ceil(filteredData.length / itemsPerPage);
 
     const handlePreviousPage = () => {
         if (page > 1) setPage(page - 1);
@@ -62,6 +88,7 @@ const RatingCategoriesPages = () => {
         if (page < totalPages) setPage(page + 1);
     };
 
+    // Xử lý khi click vào dòng
     const handleRowClick = (item) => {
         navigate(`/vendor/rate/${item.ReviewID}`);
     };
@@ -71,59 +98,49 @@ const RatingCategoriesPages = () => {
             <div className="p-4">
                 <h1 className="text-2xl font-bold mb-4">Đánh giá của ngành hàng</h1>
                 <div className="bg-white p-4 rounded shadow">
-                    {/* Search Form */}
+                    {/* Form tìm kiếm */}
                     <div className="flex space-x-4 mb-4">
                         <input
                             type="text"
-                            placeholder="Tìm kiếm theo tên"
+                            placeholder={`Tìm theo ${searchField}`}
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                             className="border p-2 flex-1 rounded"
                         />
-                        <input
-                            type="date"
-                            value={startDate}
-                            onChange={(e) => setStartDate(e.target.value)}
+                        <select
+                            value={searchField}
+                            onChange={(e) => setSearchField(e.target.value)}
                             className="border p-2 rounded"
-                        />
-                        <span className="self-center">-</span>
-                        <input
-                            type="date"
-                            value={endDate}
-                            onChange={(e) => setEndDate(e.target.value)}
-                            className="border p-2 rounded"
-                        />
-                        <button onClick={handleSearch} className="bg-orange-500 text-white px-4 py-2 rounded">
-                            Tìm
-                        </button>
-                        <button onClick={clearFilters} className="border px-4 py-2 rounded">
-                            Dọn sạch
+                        >
+                            <option value="ReviewerName">Người đánh giá</option>
+                            <option value="ProductName">Sản phẩm</option>
+                            <option value="RatingScore">Số điểm</option>
+                            <option value="ReviewComment">Bình luận</option>
+                        </select>
+                        <button onClick={handleSort} className="bg-orange-500 text-white px-4 py-2 rounded">
+                            {isAscending ? "Tăng dần" : "Giảm dần"}
                         </button>
                     </div>
 
-                    {/* Error message */}
+                    {/* Hiển thị lỗi */}
                     {error && <p className="text-red-500">{error}</p>}
 
-                    {/* Loading state */}
+                    {/* Hiển thị trạng thái tải */}
                     {loading ? (
                         <div className="text-center">Đang tải dữ liệu...</div>
                     ) : (
-                        <div>
-                            <div className="text-right mb-2">
-                                <button className="border px-4 py-2 rounded">Tăng/Giảm</button>
-                            </div>
-
-                            {/* Data Table */}
-                            <DataTable
-                                data={ratingData}
-                                columns={column}
-                                page={page}
-                                totalPages={totalPages}
-                                handlePreviousPage={handlePreviousPage}
-                                handleNextPage={handleNextPage}
-                                onClick={handleRowClick}
-                            />
-                        </div>
+                        <DataTable
+                            data={filteredData.slice(
+                                (page - 1) * itemsPerPage,
+                                page * itemsPerPage
+                            )}
+                            columns={column}
+                            page={page}
+                            totalPages={totalPages}
+                            handlePreviousPage={handlePreviousPage}
+                            handleNextPage={handleNextPage}
+                            onClick={handleRowClick}
+                        />
                     )}
                 </div>
             </div>
