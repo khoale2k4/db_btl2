@@ -66,6 +66,7 @@ AS
 BEGIN
     SELECT 
         p.ProductName,
+        p.ProductImage,
         SUM(i.TotalQuantity) AS TotalQuantitySold,
         SUM(i.TotalQuantity * p.SalePrice) AS TotalSalesAmount
     FROM 
@@ -79,7 +80,7 @@ BEGIN
         AND o.OrderStatus = 'Completed'
         AND o.OrderDate BETWEEN @startDate AND @endDate
     GROUP BY 
-        p.ProductName
+        p.ProductName, p.ProductImage
     HAVING 
         SUM(i.TotalQuantity) > 0
     ORDER BY 
@@ -163,6 +164,7 @@ AS
 BEGIN
     SELECT 
         p.ProductID,
+        p.ProductImage,
         p.ProductName AS ProductName,    
         COALESCE(SUM(i.TotalQuantity * p.SalePrice), 0) AS TotalRevenue,
         COALESCE(AVG(CAST(r.Rating AS DECIMAL(10, 2))), 0) AS AverageRating,
@@ -171,7 +173,7 @@ BEGIN
     LEFT JOIN Invoice i ON p.ProductID = i.ProductID
     LEFT JOIN Review r ON p.ProductID = r.ProductID
     WHERE p.VendorID = @VendorID
-    GROUP BY p.ProductID, p.ProductName;
+    GROUP BY p.ProductID, p.ProductName, p.ProductImage;
 END;
 GO
 ------------------------------------- 2.3.5 Lấy các reviews của một sản phẩm
@@ -257,33 +259,3 @@ VALUES
 (5, 4, 1, 5, 'Rất dễ sử dụng, làm việc hiệu quả.', '2024-05-15'),
 (6, 5, 2, 3, 'Máy giặt khá ồn, nhưng giặt sạch.', '2024-06-07'),
 (7, 6, 1, 4, 'Máy lọc không khí chạy khá êm, không khí trong phòng sạch hơn.', '2024-07-10');
-
-
-SET FOREIGN_KEY_CHECKS = 0;
-
--- Drop all tables
-SELECT CONCAT('DROP TABLE IF EXISTS ', table_name, ';') 
-FROM information_schema.tables 
-WHERE table_schema = 'master';
-
--- Drop all triggers
-SELECT CONCAT('DROP TRIGGER IF EXISTS ', trigger_name, ';')
-FROM information_schema.triggers
-WHERE trigger_schema = 'master';
-
--- Drop all procedures
-SELECT CONCAT('DROP PROCEDURE IF EXISTS ', routine_name, ';')
-FROM information_schema.routines
-WHERE routine_schema = 'master' AND routine_type = 'PROCEDURE';
-
--- Drop all functions
-SELECT CONCAT('DROP FUNCTION IF EXISTS ', routine_name, ';')
-FROM information_schema.routines
-WHERE routine_schema = 'master' AND routine_type = 'FUNCTION';
-
--- Drop all views
-SELECT CONCAT('DROP VIEW IF EXISTS ', table_name, ';')
-FROM information_schema.views
-WHERE table_schema = 'master';
-
-SET FOREIGN_KEY_CHECKS = 1;
