@@ -145,7 +145,8 @@ const RatingAndCategoryProductsPages = () => {
 
                     {/* Table */}
                     <DataTable
-                        data={sortedData()}
+                        data={products}
+                            // sortedData()}
                         columns={dataType === "Ngành hàng" ? columnCategory : columnProduct}
                         page={page}
                         totalPages={totalPages}

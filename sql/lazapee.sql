@@ -449,3 +449,47 @@ SELECT * FROM Orders;
 
 -- Hiển thị tất cả các Invoices
 SELECT * FROM Invoice;
+
+-- Tạo các comment mẫu
+DECLARE @Comments TABLE (ID INT IDENTITY(1,1), Comment TEXT)
+INSERT INTO @Comments (Comment)
+VALUES
+('Great product, highly recommended!'),
+('Not bad, but could be better.'),
+('Amazing quality and fast delivery!'),
+('Very disappointed with this purchase.'),
+('Worth every penny.'),
+('Item arrived late but the quality is good.'),
+('Decent product for the price.'),
+('Exceeded my expectations!'),
+('Would not buy again.'),
+('Loved it, will order again!');
+
+-- Lấy số lượng ProductID và UserID để tạo dữ liệu ngẫu nhiên
+DECLARE @ProductCount INT = (SELECT COUNT(*) FROM Products);
+DECLARE @UserCount INT = (SELECT COUNT(*) FROM Customer);
+
+-- Tạo 100 review ngẫu nhiên
+DECLARE @i INT = 1;
+
+WHILE @i <= 100
+BEGIN
+    INSERT INTO Review (ProductID, UserID, Rating, Comment, ReviewDate)
+    VALUES (
+        -- Chọn ngẫu nhiên ProductID
+        (SELECT TOP 1 ProductID FROM Products ORDER BY NEWID()),
+        -- Chọn ngẫu nhiên UserID
+        (SELECT TOP 1 UserID FROM Customer ORDER BY NEWID()),
+        -- Rating ngẫu nhiên từ 1 đến 5
+        FLOOR(RAND() * 5 + 1),
+        -- Chọn ngẫu nhiên một comment từ bảng mẫu
+        (SELECT TOP 1 Comment FROM @Comments ORDER BY NEWID()),
+        -- Ngày ngẫu nhiên trong vòng 1 năm qua
+        DATEADD(DAY, -1 * FLOOR(RAND() * 365), GETDATE())
+    );
+
+    SET @i = @i + 1;
+END;
+
+-- Kiểm tra kết quả
+SELECT * FROM Review;
