@@ -59,11 +59,13 @@ CREATE TABLE Category(
 );
 INSERT INTO Category (Category_ID, Category_Name)
 VALUES 
-(1, 'Electronic Application'),
-(2, 'Accessories'),
-(3, 'Clothes');
+(1, 'HouseholdApplication'),
+(2, 'ElectronicEquipment'),
+(3, 'Accessory'),
+(4, 'Fashion'),
+(5, 'Clothes');
 SELECT * FROM Category;
---DROP TABLE Category;
+
 
 --Bảng Sán phẩm
 CREATE TABLE Products (
@@ -72,14 +74,17 @@ CREATE TABLE Products (
     ProductName VARCHAR(100) NOT NULL,
     ProductDescription TEXT,
     PurchasePrice DECIMAL(10, 2) CHECK (PurchasePrice >= 0),
-    Rating DECIMAL(10, 2) DEFAULT 0 CHECK(Rating <= 5 AND Rating >= 0),
     SalePrice DECIMAL(10, 2),
     StockQuantity INT CHECK (StockQuantity >= 0),
     CategoryID INT,
     ProductImage VARCHAR(255),
+    Deleted BIT DEFAULT 0,
+    Sold BIT DEFAULT 0,
 	CONSTRAINT sale_price_ck CHECK (SalePrice >= PurchasePrice),
-	CONSTRAINT fk_Vendor_ID FOREIGN KEY (VendorID) REFERENCES Vendor(VendorID),
+	CONSTRAINT fk_Vendor_ID FOREIGN KEY (VendorID) REFERENCES Vendor(VendorID)
+	ON DELETE SET NULL ON UPDATE CASCADE,
 	CONSTRAINT fk_Category_ID FOREIGN KEY (CategoryID) REFERENCES Category(Category_ID)
+	ON DELETE SET NULL ON UPDATE CASCADE
 );
 INSERT INTO Products (VendorID, ProductName, ProductDescription, PurchasePrice, SalePrice, StockQuantity, CategoryID, ProductImage)
 VALUES 
@@ -99,8 +104,10 @@ CREATE TABLE Orders (
     OrderDate DATE NOT NULL,
     TotalAmount DECIMAL(11, 2) CHECK (TotalAmount > 0),
     OrderStatus VARCHAR(20),
-    CONSTRAINT fk_user_id1  FOREIGN KEY (UserID) REFERENCES Customer(UserID),
-    CONSTRAINT fk_vendor_id2 FOREIGN KEY (VendorID) REFERENCES Vendor(VendorID),
+    CONSTRAINT fk_user_id1  FOREIGN KEY (UserID) REFERENCES Customer(UserID)
+	ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT fk_vendor_id2 FOREIGN KEY (VendorID) REFERENCES Vendor(VendorID)
+	ON DELETE CASCADE ON UPDATE CASCADE
 );
 ALTER TABLE Orders
 ADD CONSTRAINT DF_OrderDate DEFAULT GETDATE() FOR OrderDate;
@@ -129,7 +136,7 @@ VALUES
 (2, 2, 50, 49.99),
 (2, 2, 100, 169.99);
 SELECT * FROM Order_detail;
---DROP TABLE Order_detail;
+--DROP TABLE Invoice;
 
 --bảng giỏ hàng
 CREATE TABLE CART(
@@ -146,7 +153,6 @@ VALUES
 (2, 2),-- truy vấn giỏ hàng của customer số 2
 (2, 2);
 SELECT * FROM CART;
-DROP TABLE CART;
 
 --bảng mã giảm giá
 CREATE TABLE Vouchers (
@@ -154,18 +160,19 @@ CREATE TABLE Vouchers (
 	UserID INT,
 	ProductID INT,
 	OrderID INT,
-	VendorID INT,
 	DiscountValue DECIMAL(11,2) CHECK (DiscountValue >= 10 AND DiscountValue <=100),
 	DiscountName VARCHAR(200),
-	CONSTRAINT fk_UserID FOREIGN KEY (UserID) REFERENCES Customer(UserID),
-	CONSTRAINT fk_ProductID FOREIGN KEY (ProductID) REFERENCES Products(ProductID),
-	CONSTRAINT fk_OrderID FOREIGN KEY (OrderID) REFERENCES Orders(OrderID),
-	CONSTRAINT fk_VendorID FOREIGN KEY (OrderID) REFERENCES Vendor(VendorID)
+	CONSTRAINT fk_OrderID FOREIGN KEY (OrderID) REFERENCES Orders(OrderID)
+	ON DELETE NO ACTION ON UPDATE NO ACTION,
+	CONSTRAINT fk_ProductID FOREIGN KEY (ProductID) REFERENCES Products(ProductID)
+	ON DELETE CASCADE ON UPDATE CASCADE,
+	CONSTRAINT fk_UserID FOREIGN KEY (UserID) REFERENCES Customer(UserID)
+	ON DELETE NO ACTION ON UPDATE NO ACTION
 );
-INSERT INTO  Vouchers(VouchersID, UserID, ProductID, OrderID, VendorID, DiscountValue,DiscountName)
+INSERT INTO  Vouchers(VouchersID, UserID, ProductID, OrderID, DiscountValue,DiscountName)
 VALUES 
-(1, 1, 1, 1, 1, 50.00, 'KettleDiscount'),
-(2, 1, 2, 2, 2, 25.99, 'PhoneDiscount');
+(1, 1, 1, 1, 50.00, 'KettleDiscount'),
+(2, 2, 2, 2, 25.99, 'PhoneDiscount');
 --(3, 2, 2, 50, 49.99),
 --(4, 2, 2, 100, 169.99);
 SELECT * FROM Vouchers;
@@ -179,6 +186,7 @@ CREATE TABLE HouseholdApplication (
     HHA_Weight DECIMAL(5, 2),
     PowerConsumption INT,
     CONSTRAINT fk_product_id2 FOREIGN KEY (ProductID) REFERENCES Products(ProductID)
+    ON DELETE CASCADE ON UPDATE CASCADE
 );
 INSERT INTO HouseholdApplication (ProductID, Color, Voltage, HHA_Weight, PowerConsumption)
 VALUES 
@@ -195,6 +203,7 @@ CREATE TABLE ElectronicEquipment (
     OperatingSystem VARCHAR(50),
     CPU VARCHAR(50),
     CONSTRAINT fk_product_id3 FOREIGN KEY (ProductID) REFERENCES Products(ProductID)
+    ON DELETE CASCADE ON UPDATE CASCADE
 );
 -- Insert sample data for ElectronicEquipment table
 INSERT INTO ElectronicEquipment (ProductID, Weight, ScreenSize, OperatingSystem, CPU)
@@ -209,6 +218,7 @@ CREATE TABLE Accessory (
     ProductID INT PRIMARY KEY,
     Color VARCHAR(50),
     CONSTRAINT fk_product_id4 FOREIGN KEY (ProductID) REFERENCES Products(ProductID)
+    ON DELETE CASCADE ON UPDATE CASCADE
 );
 -- Insert sample data for Accessory table
 INSERT INTO Accessory (AccessoryID,ProductID, Color)
@@ -223,6 +233,7 @@ CREATE TABLE Fashion (
     Style VARCHAR(50),
     Material VARCHAR(50),
     CONSTRAINT fk_Accessory_id FOREIGN KEY (ProductID) REFERENCES Accessory(ProductID)
+    ON DELETE CASCADE ON UPDATE CASCADE
 );
 -- Insert sample data for Fashion table
 INSERT INTO Fashion (ProductID, Style, Material)
@@ -238,6 +249,7 @@ CREATE TABLE Clothes (
     Style VARCHAR(50),
     Material VARCHAR(50),
     CONSTRAINT fk_product_id5 FOREIGN KEY (ProductID) REFERENCES Products(ProductID)
+    ON DELETE CASCADE ON UPDATE CASCADE
 );
 -- Insert sample data for Clothes table
 INSERT INTO Clothes (ProductID, Color, Style, Material)
@@ -266,16 +278,18 @@ CREATE TABLE Invoice (
     ProductID INT,
     TotalQuantity INT CHECK (TotalQuantity > 0),
     IssueDate DATE NOT NULL,
-    CONSTRAINT fk_order_id2 FOREIGN KEY (OrderID) REFERENCES Orders(OrderID),
+    CONSTRAINT fk_order_id2 FOREIGN KEY (OrderID) REFERENCES Orders(OrderID)
+	ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT fk_product_id6 FOREIGN KEY (ProductID) REFERENCES Products(ProductID)
+	ON DELETE NO ACTION ON UPDATE NO ACTION
 );
 -- Insert sample data for Invoice table
-INSERT INTO Invoice (InvoiceID, OrderID, ProductID, TotalQuantity, IssueDate)
+INSERT INTO Invoice (OrderID, ProductID, TotalQuantity, IssueDate)
 VALUES 
-(1, 1, 1, 2, '2024-11-07'),
-(2, 2, 2, 1, '2024-11-08');
+(1, 1, 2, '2024-11-07'),
+(2, 2, 1, '2024-11-08');
 SELECT * FROM Invoice;
-DROP TABLE Invoice;
+--DROP TABLE Invoice;
 
 -- Create table for Complaint
 CREATE TABLE Complaint (
@@ -286,6 +300,9 @@ CREATE TABLE Complaint (
     ComplaintStatus VARCHAR(20),
     ComplaintDate DATE,
     CONSTRAINT fk_order_id3 FOREIGN KEY (OrderID) REFERENCES Orders(OrderID)
+	ON DELETE CASCADE ON UPDATE CASCADE,
+	CONSTRAINT fk_product_id8 FOREIGN KEY (ProductID) REFERENCES Products(ProductID)
+	ON DELETE NO ACTION ON UPDATE NO ACTION
 );
 -- Insert sample data for Complaint table
 INSERT INTO Complaint (OrderID, ProductID, ComplaintContent, ComplaintStatus, ComplaintDate)
@@ -304,8 +321,10 @@ CREATE TABLE Review (
     Rating INT CHECK (Rating BETWEEN 1 AND 5),
     Comment TEXT,
     ReviewDate DATE,
-    CONSTRAINT fk_product_id7 FOREIGN KEY (ProductID) REFERENCES Products(ProductID),
+    CONSTRAINT fk_product_id7 FOREIGN KEY (ProductID) REFERENCES Products(ProductID)
+	ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT fk_user_id6 FOREIGN KEY (UserID) REFERENCES Customer(UserID)
+	ON DELETE CASCADE ON UPDATE CASCADE
 );
 -- Insert sample data for Review table
 INSERT INTO Review (ProductID, UserID, Rating, Comment, ReviewDate)
@@ -322,8 +341,10 @@ CREATE TABLE Conversation (
     StartDate DATE,
     UserID INT,
     VendorID INT,
-    CONSTRAINT fk_user_id7 FOREIGN KEY (UserID) REFERENCES Customer(UserID),
+    CONSTRAINT fk_user_id7 FOREIGN KEY (UserID) REFERENCES Customer(UserID)
+	ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT fk_vendor_id6 FOREIGN KEY (VendorID) REFERENCES Vendor(VendorID)
+	ON DELETE CASCADE ON UPDATE CASCADE
 );
 -- Insert sample data for Conversation table
 INSERT INTO Conversation (StartDate, UserID, VendorID)
@@ -341,8 +362,10 @@ CREATE TABLE Message (
     SenderID INT,
 	ConvID INT,
     Content TEXT NOT NULL,
-    CONSTRAINT fk_user_id8 FOREIGN KEY (SenderID) REFERENCES Customer(UserID),
+    CONSTRAINT fk_user_id8 FOREIGN KEY (SenderID) REFERENCES Customer(UserID)
+	ON DELETE CASCADE ON UPDATE CASCADE,
 	CONSTRAINT fk_conv_id FOREIGN KEY (ConvID) REFERENCES Conversation(ConvID)
+	ON DELETE NO ACTION ON UPDATE NO ACTION
 );
 -- Insert sample data for Message table
 INSERT INTO Message (SentDate, SenderID, ConvID, Content)
@@ -353,112 +376,3 @@ SELECT * FROM Message;
 --DROP TABLE Message;
 
 
-INSERT INTO Products (VendorID, ProductName, ProductDescription, PurchasePrice, SalePrice, StockQuantity, CategoryID, ProductImage)
-VALUES 
-(1, 'Wireless Headphones', 'Noise-cancelling over-ear headphones', 75.00, 120.00, 200, 1, 'headphones.jpg'),
-(1, 'Smart Watch', 'Fitness tracking and notifications', 50.00, 100.00, 150, 1, 'smartwatch.jpg'),
-(2, 'Desk Lamp', 'LED desk lamp with adjustable brightness', 20.00, 40.00, 300, 1, 'desklamp.jpg'),
-(2, 'Bluetooth Speaker', 'Portable speaker with 10-hour battery life', 30.00, 60.00, 250, 1, 'speaker.jpg'),
-(3, 'Leather Wallet', 'Premium leather wallet with RFID protection', 25.00, 50.00, 100, 2, 'wallet.jpg'),
-(3, 'Necklace', 'Gold-plated necklace with pendant', 100.00, 150.00, 75, 2, 'necklace.jpg'),
-(4, 'Sunglasses', 'Polarized sunglasses for men and women', 15.00, 30.00, 200, 2, 'sunglasses.jpg'),
-(4, 'Running Shoes', 'Lightweight running shoes for all terrains', 45.00, 90.00, 120, 3, 'shoes.jpg'),
-(3, 'Jacket', 'Waterproof jacket for winter', 70.00, 120.00, 80, 3, 'jacket.jpg'),
-(4, 'Backpack', 'Durable backpack with multiple compartments', 40.00, 80.00, 150, 3, 'backpack.jpg');
-
-INSERT INTO Customer (Username, FullName, PasswordHash, PhoneNumber, Address, AccountStatus)
-VALUES 
-('alice_wonder', 'Alice Wonderland', '$2y$05$kksf...abc123', '111111111', '789 Dream St', 'Active'),
-('bob_builder', 'Bob Builder', '$2y$05$xyz...def456', '222222222', '456 Hammer Ln', 'Warned'),
-('charlie_brown', 'Charlie Brown', '$2y$05$pqr...ghi789', '333333333', '123 Snoopy Rd', 'Locked');
-
-INSERT INTO Orders (VendorID, UserID, OrderDate, TotalAmount, OrderStatus)
-VALUES 
-(2, 1, '2024-12-01', 300.00, 'Completed'),
-(1, 2, '2024-12-02', 150.00, 'Processing'),
-(2, 3, '2024-12-03', 220.00, 'Shipped'),
-(3, 4, '2024-12-03', 350.00, 'Completed'),
-(4, 5, '2024-12-04', 400.00, 'Processing'),
-(1, 1, '2024-12-04', 180.00, 'Completed'),
-(2, 2, '2024-12-05', 120.00, 'Shipped'),
-(2, 3, '2024-12-05', 200.00, 'Completed'),
-(3, 4, '2024-12-06', 320.00, 'Processing'),
-(4, 5, '2024-12-06', 250.00, 'Completed');
-
-INSERT INTO Invoice(OrderID, ProductID, TotalQuantity, IssueDate)
-VALUES 
--- Order 1
-(1, 1, 2, '2024-12-01'),
-(1, 3, 1, '2024-12-01'),
-(1, 7, 1, '2024-12-01'),
--- Order 2
-(2, 2, 1, '2024-12-02'),
-(2, 4, 2, '2024-12-02'),
-(2, 5, 1, '2024-12-02'),
--- Order 3
-(3, 6, 1, '2024-12-03'),
-(3, 8, 2, '2024-12-03'),
-(3, 10, 1, '2024-12-03'),
--- Order 4
-(4, 9, 2, '2024-12-03'),
-(4, 7, 3, '2024-12-03'),
-(4, 1, 1, '2024-12-03'),
--- Order 5
-(5, 2, 2, '2024-12-04'),
-(5, 5, 1, '2024-12-04'),
-(5, 10, 2, '2024-12-04'),
--- Order 6
-(6, 8, 2, '2024-12-04'),
-(6, 3, 3, '2024-12-04'),
-(6, 1, 1, '2024-12-04'),
--- Order 7
-(7, 4, 3, '2024-12-05'),
-(7, 6, 1, '2024-12-05'),
-(7, 9, 1, '2024-12-05'),
--- Order 8
-(8, 7, 2, '2024-12-05'),
-(8, 8, 1, '2024-12-05'),
-(8, 5, 1, '2024-12-05'),
--- Order 9
-(9, 10, 3, '2024-12-06'),
-(9, 1, 2, '2024-12-06'),
-(9, 4, 1, '2024-12-06'),
--- Order 10
-(10, 3, 1, '2024-12-06'),
-(10, 8, 2, '2024-12-06'),
-(10, 6, 1, '2024-12-06');
-
-INSERT INTO Review (ProductID, UserID, Rating, Comment, ReviewDate)
-VALUES
--- Review cho Product 1
-(1, 1, 5, 'Sản phẩm rất tốt, đúng như mô tả.', '2024-12-01'),
-(1, 2, 4, 'Hài lòng nhưng còn cải thiện được.', '2024-12-02'),
--- Review cho Product 2
-(2, 3, 3, 'Chất lượng trung bình, cần cải tiến.', '2024-12-03'),
-(2, 4, 5, 'Tuyệt vời! Sẽ mua lại.', '2024-12-04'),
--- Review cho Product 3
-(3, 5, 4, 'Hài lòng, nhưng giao hàng hơi chậm.', '2024-12-05'),
-(3, 1, 3, 'Ổn nhưng cần cải thiện thêm.', '2024-12-06'),
--- Review cho Product 4
-(4, 2, 5, 'Rất đáng giá tiền, chất lượng tốt.', '2024-12-06'),
-(4, 3, 4, 'Hài lòng với sản phẩm.', '2024-12-07'),
--- Review cho Product 5
-(5, 4, 5, 'Sản phẩm rất tốt, đóng gói kỹ càng.', '2024-12-08'),
-(5, 5, 3, 'Tạm ổn nhưng chưa thật sự ấn tượng.', '2024-12-09'),
--- Review cho Product 6
-(6, 1, 4, 'Phù hợp với giá tiền.', '2024-12-10'),
-(6, 2, 2, 'Không như mong đợi.', '2024-12-11'),
--- Review cho Product 7
-(7, 3, 5, 'Hoàn hảo, rất hài lòng.', '2024-12-12'),
-(7, 4, 4, 'Chất lượng và dịch vụ tốt.', '2024-12-13'),
--- Review cho Product 8
-(8, 5, 3, 'Ổn, nhưng có thể tốt hơn.', '2024-12-14'),
-(8, 1, 4, 'Giá cả hợp lý, sản phẩm tốt.', '2024-12-15'),
--- Review cho Product 9
-(9, 2, 5, 'Rất hài lòng với sản phẩm.', '2024-12-16'),
-(9, 3, 4, 'Tốt, nhưng giao hàng hơi chậm.', '2024-12-17'),
--- Review cho Product 10
-(10, 4, 5, 'Sản phẩm rất tuyệt vời.', '2024-12-18'),
-(10, 5, 3, 'Ổn, nhưng chưa thật sự nổi bật.', '2024-12-19');
-
-EXEC GetProductSalesByVendor @p_VendorID = 2, @startDate = '2024-01-01', @endDate = '2024-12-31'
