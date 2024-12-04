@@ -6,13 +6,13 @@ const columnProduct = [
     { header: " ", accessor: "ProductImage" },
     { header: "Tên sản phẩm", accessor: "ProductName" },
     { header: "Doanh thu (nghìn VNĐ)", accessor: "TotalRevenue" },
-    { header: "Đã bán", accessor: "Sold" },
+    { header: "Đã xuất kho", accessor: "Sold" },
     { header: "Đánh giá", accessor: "AverageRating" },
 ];
 
 const columnCategory = [
     { header: "Tên ngành hàng", accessor: "Category_Name" },
-    { header: "Doanh thu", accessor: "TotalRevenue" },
+    { header: "Doanh thu (nghìn VNĐ)", accessor: "TotalRevenue" },
     { header: "Đánh giá trung bình", accessor: "AverageRating" },
 ];
 
@@ -145,7 +145,7 @@ const RatingAndCategoryProductsPages = () => {
 
                     {/* Table */}
                     <DataTable
-                        data={products}
+                        data={sortedData().slice((page - 1) * itemsPerPage, page * itemsPerPage)}
                             // sortedData()}
                         columns={dataType === "Ngành hàng" ? columnCategory : columnProduct}
                         page={page}

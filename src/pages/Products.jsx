@@ -32,6 +32,10 @@ const ProductsPages = () => {
         fetchProducts();
     };
 
+    const filteredData = data2.filter((item) =>
+        item.ProductName.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
     const clearFilters = () => {
         setSearchTerm('');
         setStartDate('2024-01-01');
@@ -40,7 +44,7 @@ const ProductsPages = () => {
 
     const [page, setPage] = React.useState(1);
     const itemsPerPage = 5;
-    const totalPages = Math.ceil(data2.length / itemsPerPage);
+    const totalPages = Math.ceil(filteredData.length / itemsPerPage);
 
     const handlePreviousPage = () => {
         if (page > 1) setPage(page - 1);
@@ -88,7 +92,7 @@ const ProductsPages = () => {
                     {/* Table */}
                     <div>
                         <DataTable
-                            data={data2.slice((page - 1) * itemsPerPage, page * itemsPerPage)}
+                            data={filteredData.slice((page - 1) * itemsPerPage, page * itemsPerPage)}
                                 // 
                             columns={column}
                             page={page}

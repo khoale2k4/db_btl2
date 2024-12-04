@@ -1,5 +1,10 @@
 GO
 /* Tạo hàm insert Product */
+
+IF OBJECT_ID('InsertProduct', 'P') IS NOT NULL
+    DROP PROCEDURE InsertProduct;
+GO;
+
 CREATE PROCEDURE InsertProduct 
 @VendorID INT,
 @ProductName VARCHAR(100), 
@@ -50,7 +55,7 @@ BEGIN
 END;
 
 
-/*Lời gọi tạo một sản phẩm thêm vào product sẽ đưa ra thông báo lỗi nếu như không hợp lệ.*/
+SELECT * FROM Products WHERE ProductID = 29;
 EXEC InsertProduct 
     @VendorID = 2,
     @ProductName = 'Iphone12',
@@ -60,10 +65,15 @@ EXEC InsertProduct
     @StockQuantity = 25,
     @CategoryID = 2,
     @ProductImage = 'Iphone12.jpg';
+SELECT * FROM Products WHERE ProductID = 27;
 
 SELECT * FROM Products;
 
 /*Thủ tục cập nhật sản phẩm*/
+IF OBJECT_ID('UpdateProduct', 'P') IS NOT NULL
+    DROP PROCEDURE UpdateProduct;
+GO;
+
 GO
 CREATE PROCEDURE UpdateProduct 
 @ProductID INT, 
@@ -113,8 +123,9 @@ BEGIN
 END;
 
 -- Cập nhật sản phẩm thành Iphone 13
+SELECT * FROM Products WHERE ProductID = 27;
 EXEC UpdateProduct 
-    @ProductID = 8,
+    @ProductID = 27,
     @ProductName = 'Iphone14',
     @ProductDescription = 'Latest mopdl with 64Gb storage',
     @PurchasePrice  = 500.00,
@@ -122,9 +133,13 @@ EXEC UpdateProduct
     @StockQuantity = 25,
     @CategoryID = 2,
     @ProductImage = 'Iphone14.jpg';
+SELECT * FROM Products WHERE ProductID = 27;
 
 SELECT * FROM Products;
 		
+IF OBJECT_ID('DeleteProduct', 'P') IS NOT NULL
+    DROP PROCEDURE DeleteProduct;
+GO;
 /*Thủ tục xóa sản phẩm*/
 GO
 CREATE PROCEDURE DeleteProduct 
@@ -156,8 +171,10 @@ BEGIN
 END;
 
 -- Thực hiện xóa sản phẩm đã thêm
+SELECT * FROM Products WHERE ProductID = 1;
 EXEC DeleteProduct 
-    @Product_ID = 2;
+    @Product_ID = 1;
+SELECT * FROM Products WHERE ProductID = 1;
 
 SELECT * FROM Products;
 SELECT * FROM Order_detail;	
