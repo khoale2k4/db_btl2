@@ -376,3 +376,76 @@ SELECT * FROM Message;
 --DROP TABLE Message;
 
 
+-- Thêm 20 sản phẩm mới vào bảng Products
+INSERT INTO Products (VendorID, ProductName, ProductDescription, PurchasePrice, SalePrice, StockQuantity, CategoryID, ProductImage)
+VALUES 
+(1, 'Blender', 'High-power blender with multiple settings', 50.00, 80.00, 30, 1, 'blender.jpg'),
+(1, 'Microwave Oven', 'Compact microwave with grill feature', 120.00, 180.00, 20, 1, 'microwave.jpg'),
+(2, 'Tablet', 'Lightweight tablet with 256GB storage', 400.00, 550.00, 25, 2, 'tablet.jpg'),
+(2, 'Wireless Earbuds', 'Noise-cancelling earbuds with long battery life', 100.00, 150.00, 60, 2, 'earbuds.jpg'),
+(4, 'Necklace', 'Elegant gold necklace with gemstone', 200.00, 350.00, 15, 3, 'necklace.jpg'),
+(3, 'Handbag', 'Leather handbag with spacious compartments', 500.00, 750.00, 10, 3, 'handbag.jpg'),
+(4, 'Watch', 'Smartwatch with heart rate monitor', 250.00, 400.00, 40, 3, 'smartwatch.jpg'),
+(3, 'Sunglasses', 'Stylish polarized sunglasses', 50.00, 90.00, 70, 3, 'sunglasses.jpg'),
+(3, 'Jeans', 'Classic fit denim jeans', 40.00, 60.00, 50, 5, 'jeans.jpg'),
+(4, 'Sneakers', 'Comfortable sneakers for everyday wear', 60.00, 100.00, 80, 5, 'sneakers.jpg'),
+(1, 'Toaster', '2-slice toaster with adjustable settings', 20.00, 35.00, 50, 1, 'toaster.jpg'),
+(1, 'Coffee Maker', 'Programmable coffee maker with timer', 70.00, 110.00, 30, 1, 'coffeemaker.jpg'),
+(2, 'Gaming Laptop', 'High-performance laptop with 16GB RAM', 800.00, 1200.00, 15, 2, 'gaminglaptop.jpg'),
+(2, 'Smart TV', '4K UHD smart TV with streaming apps', 500.00, 750.00, 20, 2, 'smarttv.jpg'),
+(4, 'Bracelet', 'Silver bracelet with intricate design', 150.00, 250.00, 25, 3, 'bracelet.jpg'),
+(3, 'Backpack', 'Durable backpack with multiple pockets', 30.00, 50.00, 100, 3, 'backpack.jpg'),
+(3, 'Sweater', 'Warm wool sweater for winter', 45.00, 70.00, 40, 5, 'sweater.jpg'),
+(4, 'Leather Belt', 'Premium leather belt for formal wear', 25.00, 40.00, 60, 5, 'belt.jpg'),
+(1, 'Air Purifier', 'HEPA air purifier with silent mode', 200.00, 300.00, 25, 1, 'airpurifier.jpg'),
+(2, 'Camera', 'Digital camera with 20MP lens', 300.00, 450.00, 15, 2, 'camera.jpg');
+
+-- Hiển thị danh sách tất cả sản phẩm
+SELECT * FROM Products;
+
+INSERT INTO Customer (Username, FullName, PasswordHash, PhoneNumber, Address, AccountStatus)
+VALUES 
+('alice_wonder', 'Alice Wonder', '$2y$05$1oCZLzdrZJUXdjDpBkRxtO.NZPx1U/Z5u6v9B.YrlBxg8OtzAdZ3e', '1122334455', '789 Pine St', 'Active'),
+('bob_builder', 'Bob Builder', '$2y$05$7r1K1G3K6OJxTpsbm9/jvubAcJjLm7w/jtp8ZKy.TZGx6QobCHZrG', '2233445566', '321 Cedar St', 'Warned'),
+('charlie_brown', 'Charlie Brown', '$2y$05$UM/2L/jSmcPIg8Oco6PHZO.Y2gn8VV6ZVbI1oeH/XfpJ9xvKFpN.e', '3344556677', '654 Willow St', 'Pending');
+
+-- Thêm 30 Orders
+DECLARE @OrderID INT;
+DECLARE @OrderCount INT = 1;
+
+WHILE @OrderCount <= 30
+BEGIN
+    -- Tạo một đơn hàng ngẫu nhiên
+    INSERT INTO Orders (UserID, VendorID, TotalAmount, OrderStatus)
+    VALUES (
+        (SELECT TOP 1 UserID FROM Customer ORDER BY NEWID()), -- UserID ngẫu nhiên
+        (SELECT TOP 1 VendorID FROM Vendor ORDER BY NEWID()), -- VendorID ngẫu nhiên
+        ROUND(RAND() * 1000 + 50, 2), -- Số tiền ngẫu nhiên từ 50 - 1050
+        CASE 
+            WHEN RAND() < 0.5 THEN 'Pending'
+            ELSE 'Completed'
+        END -- Trạng thái ngẫu nhiên
+    );
+
+    -- Lấy OrderID vừa tạo
+    SET @OrderID = SCOPE_IDENTITY();
+
+    -- Thêm 3 hóa đơn cho Order này
+    INSERT INTO Invoice (OrderID, ProductID, TotalQuantity, IssueDate)
+    SELECT TOP 3 
+        @OrderID, -- OrderID hiện tại
+        ProductID, -- ProductID ngẫu nhiên
+        CAST(RAND() * 10 + 1 AS INT), -- Số lượng ngẫu nhiên từ 1 - 10
+        GETDATE() -- Ngày phát hành hiện tại
+    FROM Products
+    ORDER BY NEWID();
+
+    -- Tăng số lượng đơn hàng
+    SET @OrderCount = @OrderCount + 1;
+END;
+
+-- Hiển thị tất cả các Orders
+SELECT * FROM Orders;
+
+-- Hiển thị tất cả các Invoices
+SELECT * FROM Invoice;

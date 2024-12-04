@@ -241,21 +241,3 @@ SELECT * FROM Vendor;
 SELECT * FROM Customer;
 
 -- Insert dữ liệu cho bảng Products
-INSERT INTO Products (ProductID, VendorID, ProductName, ProductDescription, PurchasePrice, SalePrice, StockQuantity, CategoryID, ProductImage, Rating)
-VALUES
-(7, 1, 'Laptop Dell XPS 13', 'Laptop Dell XPS 13 với màn hình 13 inch, bộ vi xử lý Intel Core i7', 1200.00, 1500.00, 50, 1, 'laptop-dell-xps13.jpg', 1),
-(8, 1, 'iPhone 14 Pro', 'iPhone 14 Pro với màn hình OLED 6.1 inch', 950.00, 1200.00, 100, 2, 'iphone-14-pro.jpg', 1),
-(9, 2, 'Samsung Galaxy S22', 'Điện thoại Samsung Galaxy S22 với màn hình 6.2 inch', 800.00, 950.00, 75, 2, 'samsung-galaxy-s22.jpg', 1),
-(10, 3, 'Nồi cơm điện Panasonic', 'Nồi cơm điện Panasonic 1.8L', 50.00, 70.00, 200, 3, 'noi-com-dien-panasonic.jpg', 1),
-(11, 2, 'Máy giặt LG', 'Máy giặt LG 9kg', 400.00, 550.00, 30, 1, 'may-giat-lg.jpg', 1),
-(6, 3, 'Máy lọc không khí Sharp', 'Máy lọc không khí Sharp với công nghệ Plasmacluster', 100.00, 150.00, 120, 1, 'may-loc-khong-khi-sharp.jpg', 1);
--- Insert dữ liệu cho bảng Review
-INSERT INTO Review (ReviewID, ProductID, UserID, Rating, Comment, ReviewDate)
-VALUES
-(8, 1, 1, 5, 'Sản phẩm tuyệt vời, rất mạnh mẽ và màn hình sắc nét.', '2024-01-10'),
-(9, 1, 2, 4, 'Laptop nhẹ, tuy nhiên giá hơi cao so với hiệu suất.', '2024-02-12'),
-(10, 2, 1, 5, 'Camera tuyệt vời, hiệu suất nhanh.', '2024-03-05'),
-(11, 3, 2, 4, 'Sản phẩm ổn, nhưng có chút thiếu tính năng so với giá.', '2024-04-20'),
-(5, 4, 1, 5, 'Rất dễ sử dụng, làm việc hiệu quả.', '2024-05-15'),
-(6, 5, 2, 3, 'Máy giặt khá ồn, nhưng giặt sạch.', '2024-06-07'),
-(7, 6, 1, 4, 'Máy lọc không khí chạy khá êm, không khí trong phòng sạch hơn.', '2024-07-10');
